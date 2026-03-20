@@ -34,6 +34,7 @@ add_library(${PROJECT_NAME}
   src/iterators/SpiralIterator.cpp
   src/iterators/PolygonIterator.cpp
   src/iterators/LineIterator.cpp
+  src/iterators/TraversalGridLineIterator.cpp
   src/iterators/SlidingWindowIterator.cpp
 )
 

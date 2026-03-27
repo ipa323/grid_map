@@ -73,6 +73,10 @@ TraversalGridLineIterator & TraversalGridLineIterator::operator++()
       getIndexFromBufferIndex(index_, bufferSize_, bufferStartIndex_) + increment1_;
     index_ = getBufferIndexFromIndex(unwrappedIndex, bufferSize_, bufferStartIndex_);
     nextIndex_.push(index_);
+    const Index unwrappedIndex2 =
+      getIndexFromBufferIndex(index_, bufferSize_, bufferStartIndex_) - increment1_;
+    Index additional_index_ = getBufferIndexFromIndex(unwrappedIndex2, bufferSize_, bufferStartIndex_);
+    nextIndex_.push(additional_index_);
   }
   const Index unwrappedIndex =
     getIndexFromBufferIndex(index_, bufferSize_, bufferStartIndex_) + increment2_;

@@ -11,6 +11,9 @@ TraversalGridLineIterator::TraversalGridLineIterator(
   const grid_map::GridMap & gridMap, const Position & start,
   const Position & end)
 {
+  startPosition_ = start;
+  endPosition_ = end;
+
   Index startIndex, endIndex;
   if (getIndexLimitedToMapRange(gridMap, start, end, startIndex) &&
     getIndexLimitedToMapRange(gridMap, end, start, endIndex))
@@ -102,12 +105,12 @@ bool TraversalGridLineIterator::getIndexLimitedToMapRange(
   const Position & start, const Position & end,
   Index & index)
 {
-  startPosition_ = start;
-  endPosition_ = end;
-  Vector direction = (endPosition_ - start).normalized();
-  while (!gridMap.getIndex(startPosition_, index)) {
-    startPosition_ += (gridMap.getResolution() - std::numeric_limits<double>::epsilon()) * direction;
-    if ((startPosition_).norm() <
+  const double eps = 1e-9;
+  Vector direction = (end - start).normalized();
+  Position newStart = start + eps * direction;
+  while (!gridMap.getIndex(newStart, index)) {
+    newStart += (gridMap.getResolution() - std::numeric_limits<double>::epsilon()) * direction;
+    if ((end - newStart).norm() <
       gridMap.getResolution() - std::numeric_limits<double>::epsilon())
     {
       return false;
@@ -130,17 +133,25 @@ void TraversalGridLineIterator::initializeIterationParameters()
   {
     indexIncrementDirection_.x() = 1.0;
   }
-  else
+  else if (deltaIndex.x() < 0)
   {
     indexIncrementDirection_.x() = - 1.0;
+  }
+  else
+  {
+    indexIncrementDirection_.x() = 0.0;
   }
   if (deltaIndex.y() > 0)
   {
     indexIncrementDirection_.y() = 1.0;
   }
-  else
+  else if (deltaIndex.y() < 0)
   {
     indexIncrementDirection_.y() = - 1.0;
+  }
+  else
+  {
+    indexIncrementDirection_.y() = 0.0;
   }
 
   // Calculate in world coordinates the normalised step to reach the next cell
@@ -150,8 +161,7 @@ void TraversalGridLineIterator::initializeIterationParameters()
 
   if (indexIncrementDirection_.x() != 0)
   {
-    const double worldDirectionX = (deltaWorldCoordinates.x() > 0.0) ? 1.0 : -1.0;
-    tMaxX_ = worldDirectionX * incrementWorldCoordinates_.x() * 0.5;
+    tMaxX_ = incrementWorldCoordinates_.x() * 0.5;
   }
   else
   {
@@ -160,12 +170,11 @@ void TraversalGridLineIterator::initializeIterationParameters()
 
   if (indexIncrementDirection_.y() != 0)
   {
-    const double worldDirectionY = (deltaWorldCoordinates.y() > 0.0) ? 1.0 : -1.0;
-    tMaxY_ = worldDirectionY * incrementWorldCoordinates_.y() * 0.5;
+    tMaxY_ = incrementWorldCoordinates_.y() * 0.5;
   }
   else
   {
-    tMaxX_ = std::numeric_limits<double>::infinity();
+    tMaxY_ = std::numeric_limits<double>::infinity();
   }
 }
 }  // namespace grid_map

@@ -109,16 +109,16 @@ private:
   //! Ending index of the line.
   Index end_;
 
-  //! Current cell number.
-  unsigned int iCell_;
+  // ! Unwrapped indices
+  Index unwrappedIndex_;
+  Index unwrappedStart_;
+  Index unwrappedEnd_;
 
-  //! Number of cells in the line.
-  unsigned int nCells_;
-
-  //! Helper variables for Bresenham Line Drawing algorithm.
-  std::queue<Index> nextIndex_;
-  Size increment1_, increment2_;
-  int denominator_, numerator_, numeratorAdd_;
+  //! Helper variables for iterator.
+  Size indexIncrementDirection_;
+  Length incrementWorldCoordinates_;
+  double tMaxX_;
+  double tMaxY_;
 
   //! Map information needed to get position from iterator.
   Length mapLength_;
@@ -126,6 +126,8 @@ private:
   double resolution_;
   Size bufferSize_;
   Index bufferStartIndex_;
+  grid_map::Position startPosition_;
+  grid_map::Position endPosition_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

@@ -33,8 +33,6 @@ TraversalGridLineIterator & TraversalGridLineIterator::operator=(const Traversal
   index_ = other.index_;
   start_ = other.start_;
   end_ = other.end_;
-  iCell_ = other.iCell_;
-  nCells_ = other.nCells_;
   mapLength_ = other.mapLength_;
   mapPosition_ = other.mapPosition_;
   resolution_ = other.resolution_;
@@ -50,47 +48,39 @@ bool TraversalGridLineIterator::operator!=(const TraversalGridLineIterator & oth
 
 const Index & TraversalGridLineIterator::operator*() const
 {
-  assert(!nextIndex_.empty());
-  return nextIndex_.front();
+  return index_;
 }
 
 TraversalGridLineIterator & TraversalGridLineIterator::operator++()
 {
-  if (!nextIndex_.empty()) {
-    nextIndex_.pop();
-  }
-  // If queue is not empty return first index
-  if (!nextIndex_.empty())
+  if (tMaxX_ < tMaxY_)
   {
-    return *this;
+    unwrappedIndex_.x() += indexIncrementDirection_.x();
+    tMaxX_ += incrementWorldCoordinates_.x();
   }
-  if (iCell_ < nCells_)
+  else if (tMaxY_ < tMaxX_)
   {
-  numerator_ += numeratorAdd_;  // Increase the numerator by the top of the fraction.
-  if (numerator_ >= denominator_) {
-    numerator_ -= denominator_;
-    const Index unwrappedIndex =
-      getIndexFromBufferIndex(index_, bufferSize_, bufferStartIndex_) + increment1_;
-    index_ = getBufferIndexFromIndex(unwrappedIndex, bufferSize_, bufferStartIndex_);
-    nextIndex_.push(index_);
-    const Index unwrappedIndex2 =
-      getIndexFromBufferIndex(index_, bufferSize_, bufferStartIndex_) - increment1_;
-    Index additional_index_ = getBufferIndexFromIndex(unwrappedIndex2, bufferSize_, bufferStartIndex_);
-    nextIndex_.push(additional_index_);
+    unwrappedIndex_.y() += indexIncrementDirection_.y();
+    tMaxY_ += incrementWorldCoordinates_.y();
   }
-  const Index unwrappedIndex =
-    getIndexFromBufferIndex(index_, bufferSize_, bufferStartIndex_) + increment2_;
-  index_ = getBufferIndexFromIndex(unwrappedIndex, bufferSize_, bufferStartIndex_);
-  nextIndex_.push(index_);
-}
-++iCell_;
-return *this;
+  else
+  {
+    // Exact corner crossing.
+    unwrappedIndex_.x() += indexIncrementDirection_.x();
+    unwrappedIndex_.y() += indexIncrementDirection_.y();
+    tMaxX_ += incrementWorldCoordinates_.x();
+    tMaxY_ += incrementWorldCoordinates_.y();
+  }
+  // Convert the unwrapped/global index back to the actual buffer index.
+  index_ =getBufferIndexFromIndex(unwrappedIndex_, bufferSize_, bufferStartIndex_);
+  return *this;
 }
 
 bool TraversalGridLineIterator::isPastEnd() const
 {
-  return nextIndex_.empty();
-}
+  const bool pastX = (indexIncrementDirection_.x() > 0 && unwrappedIndex_.x() > unwrappedEnd_.x()) || (indexIncrementDirection_.x() < 0 && unwrappedIndex_.x() < unwrappedEnd_.x());
+  const bool pastY = (indexIncrementDirection_.y() > 0 && unwrappedIndex_.y() > unwrappedEnd_.y()) || (indexIncrementDirection_.y() < 0 && unwrappedIndex_.y() < unwrappedEnd_.y());
+  return pastX || pastY;}
 
 bool TraversalGridLineIterator::initialize(
   const grid_map::GridMap & gridMap, const Index & start,
@@ -112,11 +102,12 @@ bool TraversalGridLineIterator::getIndexLimitedToMapRange(
   const Position & start, const Position & end,
   Index & index)
 {
-  Position newStart = start;
-  Vector direction = (end - start).normalized();
-  while (!gridMap.getIndex(newStart, index)) {
-    newStart += (gridMap.getResolution() - std::numeric_limits<double>::epsilon()) * direction;
-    if ((end - newStart).norm() <
+  startPosition_ = start;
+  endPosition_ = end;
+  Vector direction = (endPosition_ - start).normalized();
+  while (!gridMap.getIndex(startPosition_, index)) {
+    startPosition_ += (gridMap.getResolution() - std::numeric_limits<double>::epsilon()) * direction;
+    if ((startPosition_).norm() <
       gridMap.getResolution() - std::numeric_limits<double>::epsilon())
     {
       return false;
@@ -127,51 +118,54 @@ bool TraversalGridLineIterator::getIndexLimitedToMapRange(
 
 void TraversalGridLineIterator::initializeIterationParameters()
 {
-  iCell_ = 0;
+  unwrappedStart_ = getIndexFromBufferIndex(start_, bufferSize_, bufferStartIndex_);
+  unwrappedEnd_ = getIndexFromBufferIndex(end_, bufferSize_, bufferStartIndex_);
+  unwrappedIndex_ = unwrappedStart_;
+
   index_ = start_;
-  nextIndex_.push(index_);
 
-  const Index unwrappedStart = getIndexFromBufferIndex(start_, bufferSize_, bufferStartIndex_);
-  const Index unwrappedEnd = getIndexFromBufferIndex(end_, bufferSize_, bufferStartIndex_);
-  const Size delta = (unwrappedEnd - unwrappedStart).abs();
-
-  if (unwrappedEnd.x() >= unwrappedStart.x()) {
-    // x-values increasing.
-    increment1_.x() = 1;
-    increment2_.x() = 1;
-  } else {
-    // x-values decreasing.
-    increment1_.x() = -1;
-    increment2_.x() = -1;
+  // Extract the grid index increment directions
+  const Index deltaIndex = unwrappedEnd_ - unwrappedStart_;
+  if (deltaIndex.x() > 0)
+  {
+    indexIncrementDirection_.x() = 1.0;
+  }
+  else
+  {
+    indexIncrementDirection_.x() = - 1.0;
+  }
+  if (deltaIndex.y() > 0)
+  {
+    indexIncrementDirection_.y() = 1.0;
+  }
+  else
+  {
+    indexIncrementDirection_.y() = - 1.0;
   }
 
-  if (unwrappedEnd.y() >= unwrappedStart.y()) {
-    // y-values increasing.
-    increment1_.y() = 1;
-    increment2_.y() = 1;
-  } else {
-    // y-values decreasing.
-    increment1_.y() = -1;
-    increment2_.y() = -1;
+  // Calculate in world coordinates the normalised step to reach the next cell
+  const Length deltaWorldCoordinates = endPosition_ - startPosition_; 
+  incrementWorldCoordinates_.x() = (deltaWorldCoordinates.x() != 0.0) ? resolution_ / std::abs(deltaWorldCoordinates.x()) : std::numeric_limits<float>::infinity();
+  incrementWorldCoordinates_.y() = (deltaWorldCoordinates.y() != 0.0) ? resolution_ / std::abs(deltaWorldCoordinates.y()) : std::numeric_limits<float>::infinity();
+
+  if (indexIncrementDirection_.x() != 0)
+  {
+    const double worldDirectionX = (deltaWorldCoordinates.x() > 0.0) ? 1.0 : -1.0;
+    tMaxX_ = worldDirectionX * incrementWorldCoordinates_.x() * 0.5;
+  }
+  else
+  {
+    tMaxX_ = std::numeric_limits<double>::infinity();
   }
 
-  if (delta.x() >= delta.y()) {
-    // There is at least one x-value for every y-value.
-    increment1_.x() = 0;  // Do not change the x when numerator >= denominator.
-    increment2_.y() = 0;  // Do not change the y for every iteration.
-    denominator_ = delta.x();
-    numerator_ = delta.x() / 2;
-    numeratorAdd_ = delta.y();
-    nCells_ = delta.x() + 1;  // There are more x-values than y-values.
-  } else {
-    // There is at least one y-value for every x-value
-    increment2_.x() = 0;  // Do not change the x for every iteration.
-    increment1_.y() = 0;  // Do not change the y when numerator >= denominator.
-    denominator_ = delta.y();
-    numerator_ = delta.y() / 2;
-    numeratorAdd_ = delta.x();
-    nCells_ = delta.y() + 1;  // There are more y-values than x-values.
+  if (indexIncrementDirection_.y() != 0)
+  {
+    const double worldDirectionY = (deltaWorldCoordinates.y() > 0.0) ? 1.0 : -1.0;
+    tMaxY_ = worldDirectionY * incrementWorldCoordinates_.y() * 0.5;
+  }
+  else
+  {
+    tMaxX_ = std::numeric_limits<double>::infinity();
   }
 }
-
 }  // namespace grid_map

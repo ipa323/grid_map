@@ -121,6 +121,7 @@ if(BUILD_TESTING)
     test/GridMapTest.cpp
     test/GridMapIteratorTest.cpp
     test/LineIteratorTest.cpp
+    test/TraversabilityGridLineIteratorTest.cpp
     test/EllipseIteratorTest.cpp
     test/SubmapIteratorTest.cpp
     test/PolygonIteratorTest.cpp

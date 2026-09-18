@@ -45,25 +45,24 @@ TEST(TraversalGridLineIterator, LineTest1)
 
   ++iterator;
   EXPECT_FALSE(iterator.isPastEnd());
-  EXPECT_EQ(4, (*iterator)(0));  // SHOULD BE 3
-  EXPECT_EQ(4, (*iterator)(1));  // SHOULD BE 5
+  EXPECT_EQ(4, (*iterator)(0));
+  EXPECT_EQ(4, (*iterator)(1));
 
   ++iterator;
   EXPECT_FALSE(iterator.isPastEnd());
-  EXPECT_EQ(4, (*iterator)(0)); // Should be 4
-  EXPECT_EQ(5, (*iterator)(1)); // SHOULD BE 6
+  EXPECT_EQ(4, (*iterator)(0));
+  EXPECT_EQ(5, (*iterator)(1));
 
-  // HAS REACHED ALREADY
   ++iterator; 
   EXPECT_FALSE(iterator.isPastEnd());
-  EXPECT_EQ(4, (*iterator)(0)); // Should be 3
-  EXPECT_EQ(6, (*iterator)(1));  // SHOULD BE 7 
+  EXPECT_EQ(4, (*iterator)(0));
+  EXPECT_EQ(6, (*iterator)(1));
 
   ++iterator;
-  EXPECT_FALSE(iterator.isPastEnd()); // Should be 3
+  EXPECT_FALSE(iterator.isPastEnd());
   EXPECT_EQ(4, (*iterator)(0));  
-  EXPECT_EQ(7, (*iterator)(1)); // SHOULD BE 8
+  EXPECT_EQ(7, (*iterator)(1));
 
   ++iterator;
-  EXPECT_TRUE(iterator.isPastEnd()); // THERE IS STILL ONE MORE 
+  EXPECT_TRUE(iterator.isPastEnd());
 }

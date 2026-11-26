@@ -1,9 +1,12 @@
 /*
- * LineIteratorTest.cpp
+ * Copyright (c) 2026 Fraunhofer Institute for Manufacturing Engineering and Automation (IPA)
+ * All rights reserved.
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
  *
- *  Created on: Sep 14, 2016
- *      Author: Dominic Jud
- *	 Institute: ETH Zurich, ANYbotics
+ * Name:       Tests for the Amanatides-Woo Grid Line Iterator
+ * Author:     Natalia Melo Fernandez
+ * Date:       26.11.2026
  */
 
 // gtest

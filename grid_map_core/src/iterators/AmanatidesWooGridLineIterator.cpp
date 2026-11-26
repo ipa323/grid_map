@@ -11,9 +11,6 @@ AmanatidesWooGridLineIterator::AmanatidesWooGridLineIterator(
   const grid_map::GridMap & gridMap, const Position & start,
   const Position & end)
 {
-  startPosition_ = start;
-  endPosition_ = end;
-
   Index startIndex, endIndex;
   if (getIndexLimitedToMapRange(gridMap, start, end, startIndex) &&
     getIndexLimitedToMapRange(gridMap, end, start, endIndex))
@@ -59,20 +56,20 @@ AmanatidesWooGridLineIterator & AmanatidesWooGridLineIterator::operator++()
   if (tMaxX_ < tMaxY_)
   {
     unwrappedIndex_.x() += indexIncrementDirection_.x();
-    tMaxX_ += incrementWorldCoordinates_.x();
+    tMaxX_ += tDeltaX_;
   }
   else if (tMaxY_ < tMaxX_)
   {
     unwrappedIndex_.y() += indexIncrementDirection_.y();
-    tMaxY_ += incrementWorldCoordinates_.y();
+    tMaxY_ += tDeltaY_;
   }
   else
   {
     // Exact corner crossing.
     unwrappedIndex_.x() += indexIncrementDirection_.x();
     unwrappedIndex_.y() += indexIncrementDirection_.y();
-    tMaxX_ += incrementWorldCoordinates_.x();
-    tMaxY_ += incrementWorldCoordinates_.y();
+    tMaxX_ += tDeltaX_;
+    tMaxY_ += tDeltaY_;
   }
   // Convert the unwrapped/global index back to the actual buffer index.
   index_ =getBufferIndexFromIndex(unwrappedIndex_, bufferSize_, bufferStartIndex_);
@@ -154,27 +151,15 @@ void AmanatidesWooGridLineIterator::initializeIterationParameters()
     indexIncrementDirection_.y() = 0.0;
   }
 
-  // Calculate in world coordinates the normalised step to reach the next cell
-  const Length deltaWorldCoordinates = endPosition_ - startPosition_; 
-  incrementWorldCoordinates_.x() = (deltaWorldCoordinates.x() != 0.0) ? resolution_ / std::abs(deltaWorldCoordinates.x()) : std::numeric_limits<float>::infinity();
-  incrementWorldCoordinates_.y() = (deltaWorldCoordinates.y() != 0.0) ? resolution_ / std::abs(deltaWorldCoordinates.y()) : std::numeric_limits<float>::infinity();
+  // Calculate in grid indices the normalised step to reach the next cell
+  tDeltaX_ = deltaIndex.x() != 0
+            ? 0.5 / std::abs(static_cast<double>(deltaIndex.x()))
+            : std::numeric_limits<float>::infinity();
+  tDeltaY_ = deltaIndex.y() != 0
+            ? 0.5 / std::abs(static_cast<double>(deltaIndex.y()))
+            : std::numeric_limits<float>::infinity();
 
-  if (indexIncrementDirection_.x() != 0)
-  {
-    tMaxX_ = incrementWorldCoordinates_.x() * 0.5;
-  }
-  else
-  {
-    tMaxX_ = std::numeric_limits<double>::infinity();
-  }
-
-  if (indexIncrementDirection_.y() != 0)
-  {
-    tMaxY_ = incrementWorldCoordinates_.y() * 0.5;
-  }
-  else
-  {
-    tMaxY_ = std::numeric_limits<double>::infinity();
-  }
+  tMaxX_ = 0.5 * tDeltaX_;
+  tMaxY_ = 0.5 * tDeltaY_;
 }
 }  // namespace grid_map

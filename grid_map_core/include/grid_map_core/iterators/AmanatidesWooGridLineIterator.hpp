@@ -118,7 +118,8 @@ private:
 
   //! Helper variables for iterator.
   Size indexIncrementDirection_;
-  Length incrementWorldCoordinates_;
+  double tDeltaX_;
+  double tDeltaY_;
   double tMaxX_;
   double tMaxY_;
 
@@ -128,8 +129,6 @@ private:
   double resolution_;
   Size bufferSize_;
   Index bufferStartIndex_;
-  grid_map::Position startPosition_;
-  grid_map::Position endPosition_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

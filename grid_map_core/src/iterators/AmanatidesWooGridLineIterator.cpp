@@ -1,4 +1,4 @@
-#include "grid_map_core/iterators/TraversalGridLineIterator.hpp"
+#include "grid_map_core/iterators/AmanatidesWooGridLineIterator.hpp"
 #include <iostream>
 #include <limits>
 
@@ -7,7 +7,7 @@
 namespace grid_map
 {
 
-TraversalGridLineIterator::TraversalGridLineIterator(
+AmanatidesWooGridLineIterator::AmanatidesWooGridLineIterator(
   const grid_map::GridMap & gridMap, const Position & start,
   const Position & end)
 {
@@ -20,18 +20,18 @@ TraversalGridLineIterator::TraversalGridLineIterator(
   {
     initialize(gridMap, startIndex, endIndex);
   } else {
-    throw std::invalid_argument("Failed to construct TraversalGridLineIterator.");
+    throw std::invalid_argument("Failed to construct AmanatidesWooGridLineIterator.");
   }
 }
 
-TraversalGridLineIterator::TraversalGridLineIterator(
+AmanatidesWooGridLineIterator::AmanatidesWooGridLineIterator(
   const grid_map::GridMap & gridMap, const Index & start,
   const Index & end)
 {
   initialize(gridMap, start, end);
 }
 
-TraversalGridLineIterator & TraversalGridLineIterator::operator=(const TraversalGridLineIterator & other)
+AmanatidesWooGridLineIterator & AmanatidesWooGridLineIterator::operator=(const AmanatidesWooGridLineIterator & other)
 {
   index_ = other.index_;
   start_ = other.start_;
@@ -44,17 +44,17 @@ TraversalGridLineIterator & TraversalGridLineIterator::operator=(const Traversal
   return *this;
 }
 
-bool TraversalGridLineIterator::operator!=(const TraversalGridLineIterator & other) const
+bool AmanatidesWooGridLineIterator::operator!=(const AmanatidesWooGridLineIterator & other) const
 {
   return (index_ != other.index_).any();
 }
 
-const Index & TraversalGridLineIterator::operator*() const
+const Index & AmanatidesWooGridLineIterator::operator*() const
 {
   return index_;
 }
 
-TraversalGridLineIterator & TraversalGridLineIterator::operator++()
+AmanatidesWooGridLineIterator & AmanatidesWooGridLineIterator::operator++()
 {
   if (tMaxX_ < tMaxY_)
   {
@@ -79,13 +79,13 @@ TraversalGridLineIterator & TraversalGridLineIterator::operator++()
   return *this;
 }
 
-bool TraversalGridLineIterator::isPastEnd() const
+bool AmanatidesWooGridLineIterator::isPastEnd() const
 {
   const bool pastX = (indexIncrementDirection_.x() > 0 && unwrappedIndex_.x() > unwrappedEnd_.x()) || (indexIncrementDirection_.x() < 0 && unwrappedIndex_.x() < unwrappedEnd_.x());
   const bool pastY = (indexIncrementDirection_.y() > 0 && unwrappedIndex_.y() > unwrappedEnd_.y()) || (indexIncrementDirection_.y() < 0 && unwrappedIndex_.y() < unwrappedEnd_.y());
   return pastX || pastY;}
 
-bool TraversalGridLineIterator::initialize(
+bool AmanatidesWooGridLineIterator::initialize(
   const grid_map::GridMap & gridMap, const Index & start,
   const Index & end)
 {
@@ -100,7 +100,7 @@ bool TraversalGridLineIterator::initialize(
   return true;
 }
 
-bool TraversalGridLineIterator::getIndexLimitedToMapRange(
+bool AmanatidesWooGridLineIterator::getIndexLimitedToMapRange(
   const grid_map::GridMap & gridMap,
   const Position & start, const Position & end,
   Index & index)
@@ -119,7 +119,7 @@ bool TraversalGridLineIterator::getIndexLimitedToMapRange(
   return true;
 }
 
-void TraversalGridLineIterator::initializeIterationParameters()
+void AmanatidesWooGridLineIterator::initializeIterationParameters()
 {
   unwrappedStart_ = getIndexFromBufferIndex(start_, bufferSize_, bufferStartIndex_);
   unwrappedEnd_ = getIndexFromBufferIndex(end_, bufferSize_, bufferStartIndex_);

@@ -1,28 +1,30 @@
 /*
- * LineIterator.hpp
+ * Copyright (c) 2026 Fraunhofer Institute for Manufacturing Engineering and Automation (IPA)
+ * All rights reserved.
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
  *
- *  Created on: Nov 13, 2014
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, ANYbotics
+ * Name:       Amanatides-Woo Grid Line Iterator
+ * Author:     Natalia Melo Fernandez
+ * Date:       26.11.2026
+ * Abstract:   Implements the Amanatides-Woo line iterator
  */
 
-#ifndef GRID_MAP_CORE__ITERATORS__TRAVERSALGRIDLINEITERATOR_HPP_
-#define GRID_MAP_CORE__ITERATORS__TRAVERSALGRIDLINEITERATOR_HPP_
+#ifndef GRID_MAP_CORE__ITERATORS__AMANATIDESWOOGRIDLINEITERATOR_HPP_
+#define GRID_MAP_CORE__ITERATORS__AMANATIDESWOOGRIDLINEITERATOR_HPP_
 
 #include <Eigen/Core>
-#include <queue>
 
 #include "grid_map_core/GridMap.hpp"
-#include "grid_map_core/iterators/SubmapIterator.hpp"
 
 namespace grid_map
 {
 
 /*!
- * Iterator class to iterate over a line in the map.
- * Based on Bresenham Line Drawing algorithm.
+ * Iterator class to iterate over all cells a line passes through, skipping cells touched only at a corner or boundary
+ * Based on Amanatides-Woo line iterator algorithms.
  */
-class TraversalGridLineIterator
+class AmanatidesWooGridLineIterator
 {
 public:
   /*!
@@ -32,7 +34,7 @@ public:
    * @param end the ending point of the line.
    * @throw std::invalid_argument if start and end impose an ill conditioned line iteration.
    */
-  TraversalGridLineIterator(const grid_map::GridMap & gridMap, const Position & start, const Position & end);
+  AmanatidesWooGridLineIterator(const grid_map::GridMap & gridMap, const Position & start, const Position & end);
 
   /*!
    * Constructor.
@@ -40,20 +42,20 @@ public:
    * @param start the starting index of the line.
    * @param end the ending index of the line.
    */
-  TraversalGridLineIterator(const grid_map::GridMap & gridMap, const Index & start, const Index & end);
+  AmanatidesWooGridLineIterator(const grid_map::GridMap & gridMap, const Index & start, const Index & end);
 
   /*!
    * Assignment operator.
    * @param iterator the iterator to copy data from.
    * @return a reference to *this.
    */
-  TraversalGridLineIterator & operator=(const TraversalGridLineIterator & other);
+  AmanatidesWooGridLineIterator & operator=(const AmanatidesWooGridLineIterator & other);
 
   /*!
    * Compare to another iterator.
    * @return whether the current iterator points to a different address than the other one.
    */
-  bool operator!=(const TraversalGridLineIterator & other) const;
+  bool operator!=(const AmanatidesWooGridLineIterator & other) const;
 
   /*!
    * Dereference the iterator with const.
@@ -65,7 +67,7 @@ public:
    * Increase the iterator to the next element.
    * @return a reference to the updated iterator.
    */
-  TraversalGridLineIterator & operator++();
+  AmanatidesWooGridLineIterator & operator++();
 
   /*!
    * Indicates if iterator is past end.
@@ -134,4 +136,4 @@ public:
 };
 
 }  // namespace grid_map
-#endif  // GRID_MAP_CORE__ITERATORS__TRAVERSALGRIDLINEITERATOR_HPP_
+#endif  // GRID_MAP_CORE__ITERATORS__AMANATIDESWOOGRIDLINEITERATOR_HPP_

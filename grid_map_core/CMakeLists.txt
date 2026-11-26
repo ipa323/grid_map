@@ -34,7 +34,7 @@ add_library(${PROJECT_NAME}
   src/iterators/SpiralIterator.cpp
   src/iterators/PolygonIterator.cpp
   src/iterators/LineIterator.cpp
-  src/iterators/TraversalGridLineIterator.cpp
+  src/iterators/AmanatidesWooGridLineIterator.cpp
   src/iterators/SlidingWindowIterator.cpp
 )
 
@@ -121,7 +121,7 @@ if(BUILD_TESTING)
     test/GridMapTest.cpp
     test/GridMapIteratorTest.cpp
     test/LineIteratorTest.cpp
-    test/TraversabilityGridLineIteratorTest.cpp
+    test/AmanatidesWooGridLineIteratorTest.cpp
     test/EllipseIteratorTest.cpp
     test/SubmapIteratorTest.cpp
     test/PolygonIteratorTest.cpp

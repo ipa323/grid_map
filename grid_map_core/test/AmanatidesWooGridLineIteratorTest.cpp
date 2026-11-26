@@ -304,7 +304,7 @@ TEST(AmanatidesWooGridLineIterator, TraversalLineThroughCorners)
   EXPECT_TRUE(iterator.isPastEnd());
 }
 
-TEST(AmanatidesWooGridLineIterator, TraversalLineWhenTouchingTheBoundary)
+TEST(AmanatidesWooGridLineIterator, TraversalLineStartsAndEndsInTheBoundaryBetweenMultipleCells)
 {
 // Line traversal from (2.0, 2.0) to (-2.0, -2.0).
 // S = start cell; E = end cell; * = other traversed cells.
@@ -348,6 +348,73 @@ TEST(AmanatidesWooGridLineIterator, TraversalLineWhenTouchingTheBoundary)
 
   EXPECT_NO_THROW(grid_map::AmanatidesWooGridLineIterator iterator(map, grid_map::Position(2.0, 2.0), grid_map::Position(-2.0, -2.0)));
   grid_map::AmanatidesWooGridLineIterator iterator(map, grid_map::Position(2.0, 2.0), grid_map::Position(-2.0, -2.0));
+  EXPECT_FALSE(iterator.isPastEnd());
+  EXPECT_EQ(3, (*iterator)(0));
+  EXPECT_EQ(2, (*iterator)(1));
+
+  ++iterator;
+  EXPECT_FALSE(iterator.isPastEnd());
+  EXPECT_EQ(4, (*iterator)(0));
+  EXPECT_EQ(3, (*iterator)(1));
+
+  ++iterator;
+  EXPECT_FALSE(iterator.isPastEnd());
+  EXPECT_EQ(5, (*iterator)(0));
+  EXPECT_EQ(4, (*iterator)(1));
+
+  ++iterator;
+  EXPECT_FALSE(iterator.isPastEnd());
+  EXPECT_EQ(6, (*iterator)(0));
+  EXPECT_EQ(5, (*iterator)(1));
+
+  ++iterator;
+  EXPECT_TRUE(iterator.isPastEnd());
+}
+
+TEST(AmanatidesWooGridLineIterator, TraversalLineStartsAndEndsInTheBoundaryBetweenTwoCells)
+{
+// Line traversal from (1.5, 2.0) to (-1.5, -2.0).
+// S = start cell; E = end cell; * = other traversed cells.
+// y-direction increases to the left 
+// x-direction increases upwards
+// 
+//  Both endpoints lie on corners:
+// - Start (1.5, 2): upper-left corner of cell (3,2).
+// - End (-1.5,-2): lower-right corner of cell (6,5).
+//
+// Cells touched only at the corners or boundaries are not iterated over.
+// Cell that touches the start point, i.e. (3,1) is skipped.
+// Cell that touches the end point, i.e. (6,6) is skipped
+//
+//             0   1   2   3   4   5   6   7
+//           +---+---+---+---+---+---+---+---+
+//         0 |   |   |   |   |   |   |   |   |
+//           +---+---+---+---+---+---+---+---+
+//         1 |   |   |   |   |   |   |   |   |
+//           +---+---+---+---+---+---+---+---+
+//         2 |   |   |   |   |   |   |   |   |
+//           +---+---+---+---+---+---+---+---+
+//         3 |   |   | S |   |    |   |   |   |
+//           +---+---+---+---+---+---+---+---+
+//         4 |   |   |   | * |   |   |   |   |
+//           +---+---+---+---+---+---+---+---+
+//         5 |   |   |   |   | * |   |   |   |
+//           +---+---+---+---+---+---+---+---+
+//         6 |   |   |   |   |   | E |   |   |
+//           +---+---+---+---+---+---+---+---+
+//         7 |   |   |   |   |   |   |   |   |
+//           +---+---+---+---+---+---+---+---+
+//         8 |   |   |   |   |   |   |   |   |
+//           +---+---+---+---+---+---+---+---+
+//         9 |   |   |   |   |   |   |   |   |
+//           +---+---+---+---+---+---+---+---+
+//
+
+  grid_map::GridMap map({"types"});
+  map.setGeometry(grid_map::Length(10.0, 8.0), 1.0, grid_map::Position(0.0, 0.0));
+
+  EXPECT_NO_THROW(grid_map::AmanatidesWooGridLineIterator iterator(map, grid_map::Position(1.5, 2.0), grid_map::Position(-1.5, -2.0)));
+  grid_map::AmanatidesWooGridLineIterator iterator(map, grid_map::Position(1.5, 2.0), grid_map::Position(-1.5, -2.0));
   EXPECT_FALSE(iterator.isPastEnd());
   EXPECT_EQ(3, (*iterator)(0));
   EXPECT_EQ(2, (*iterator)(1));

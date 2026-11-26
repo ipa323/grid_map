@@ -22,7 +22,7 @@ namespace grid_map
 
 /*!
  * Iterator class to iterate over all cells a line passes through, skipping cells touched only at a corner or boundary
- * Based on Amanatides-Woo line iterator algorithms.
+ * Based on Amanatides-Woo line iterator algorithms (http://www.cse.yorku.ca/~amana/research/grid.pdf).
  */
 class AmanatidesWooGridLineIterator
 {

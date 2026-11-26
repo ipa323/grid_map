@@ -16,7 +16,6 @@
   <exec_depend>grid_map_core</exec_depend>
   <exec_depend>grid_map_costmap_2d</exec_depend>
   <exec_depend>grid_map_cv</exec_depend>
-  <exec_depend>grid_map_demos</exec_depend>
   <exec_depend>grid_map_filters</exec_depend>
   <exec_depend>grid_map_loader</exec_depend>
   <exec_depend>grid_map_msgs</exec_depend>
